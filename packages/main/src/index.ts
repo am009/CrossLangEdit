@@ -19,7 +19,7 @@ export async function initApp(initConfig: AppInitConfig) {
     .init(createTrayControlledTerminator())
     .init(hardwareAccelerationMode({enable: false}))
     .init(autoUpdater())
-    .init(createClipboardMonitorModule({enabled: true, prefix: '#zh:'}))
+    .init(createClipboardMonitorModule({enabled: true, prefixes: ['#zh:']}))
 
     // Install DevTools extension if needed
     // .init(chromeDevToolsExtension({extension: 'VUEJS3_DEVTOOLS'}))

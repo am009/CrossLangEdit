@@ -6,13 +6,26 @@ import { StorageService } from '../services/StorageService';
 
 export const CrossLangEdit: React.FC = () => {
   const [settings, setSettings] = useState<SettingsConfig>(() => {
-    // 延迟初始化，确保在客户端执行
     if (typeof window === 'undefined') {
       return {
-        apiEndpoint: 'https://api.openai.com/v1/chat/completions',
-        apiKey: '',
-        prompt: '请将以下文本翻译成英文，保持原意和语调：',
-        enabled: true
+        enabled: true,
+        apiConfigs: [{
+          id: 'default-openai',
+          name: 'OpenAI GPT',
+          type: 'openai',
+          endpoint: 'https://api.openai.com/v1/chat/completions',
+          apiKey: '',
+          model: 'gpt-3.5-turbo',
+          temperature: 0.3
+        }],
+        prefixConfigs: [{
+          id: 'default-zh',
+          prefix: '#zh:',
+          name: '中文翻译',
+          prompt: '请将以下文本翻译成英文，保持原意和语调：',
+          apiConfigId: 'default-openai'
+        }],
+        defaultApiConfigId: 'default-openai'
       };
     }
     return StorageService.getSettings();
@@ -21,6 +34,7 @@ export const CrossLangEdit: React.FC = () => {
   const [isTranslationModalOpen, setIsTranslationModalOpen] = useState(false);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   const [currentText, setCurrentText] = useState('');
+  const [currentPrefix, setCurrentPrefix] = useState<string>('');
   const [isMonitoring, setIsMonitoring] = useState(false);
   const [isClient, setIsClient] = useState(false);
 
@@ -44,9 +58,13 @@ export const CrossLangEdit: React.FC = () => {
       return;
     }
 
+    const prefixes = settings.prefixConfigs.map(p => p.prefix);
+    window.electronAPI.clipboard.updatePrefixes(prefixes);
+
     const unsubscribe = window.electronAPI.clipboard.onTextDetected((data) => {
       if (settings.enabled) {
         setCurrentText(data.originalText);
+        setCurrentPrefix(data.prefix || '');
         setIsTranslationModalOpen(true);
       }
     });
@@ -84,13 +102,13 @@ export const CrossLangEdit: React.FC = () => {
   };
 
   const handleTranslate = async (text: string): Promise<string> => {
-    return await translationService.translate(text);
+    return await translationService.translate(text, currentPrefix);
   };
 
   const handleCopyResult = async (originalText: string, translatedText: string) => {
     if (!isClient || !window.electronAPI?.clipboard) return;
 
-    const result = `#zh:${originalText}\n\n${translatedText}`;
+    const result = `${currentPrefix}${originalText}\n\n${translatedText}`;
     try {
       await window.electronAPI.clipboard.writeText(result);
     } catch (error) {
@@ -101,6 +119,11 @@ export const CrossLangEdit: React.FC = () => {
   const handleSettingsSave = (newSettings: SettingsConfig) => {
     setSettings(newSettings);
     StorageService.saveSettings(newSettings);
+
+    if (window.electronAPI?.clipboard) {
+      const prefixes = newSettings.prefixConfigs.map(p => p.prefix);
+      window.electronAPI.clipboard.updatePrefixes(prefixes);
+    }
 
     if (newSettings.enabled && !isMonitoring) {
       startMonitoring();
@@ -172,7 +195,8 @@ export const CrossLangEdit: React.FC = () => {
             <div className="bg-gray-50 rounded-md p-4">
               <h3 className="font-medium text-gray-800 mb-2">使用说明:</h3>
               <ul className="text-sm text-gray-600 space-y-1">
-                <li>• 复制以 "#zh:" 开头的文本</li>
+                <li>• 复制以配置的前缀开头的文本</li>
+                <li>• 当前支持的前缀: {settings.prefixConfigs.map(p => p.prefix).join(', ')}</li>
                 <li>• 系统会自动弹出翻译界面</li>
                 <li>• 点击翻译按钮进行翻译</li>
                 <li>• 按 Esc 或点击完成自动复制结果</li>
@@ -181,7 +205,7 @@ export const CrossLangEdit: React.FC = () => {
 
             <div className="text-center">
               <p className="text-xs text-gray-500">
-                API Key: {settings.apiKey ? '已配置' : '未配置'}
+                API配置: {settings.apiConfigs.length}个 | 前缀配置: {settings.prefixConfigs.length}个
               </p>
             </div>
           </div>

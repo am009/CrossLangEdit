@@ -5,7 +5,7 @@ import forceFocus from 'forcefocus';
 
 export interface ClipboardMonitorConfig {
   enabled: boolean;
-  prefix: string;
+  prefixes: string[];
 }
 
 export class ClipboardMonitor implements AppModule {
@@ -35,6 +35,11 @@ export class ClipboardMonitor implements AppModule {
       return true;
     });
 
+    ipcMain.handle('clipboard-update-prefixes', (_, prefixes: string[]) => {
+      this.#config.prefixes = prefixes;
+      return true;
+    });
+
     ipcMain.handle('clipboard-write-text', (_, text: string) => {
       clipboard.writeText(text);
       this.#lastClipboardText = text;
@@ -57,31 +62,35 @@ export class ClipboardMonitor implements AppModule {
     this.#intervalId = setInterval(() => {
       const currentText = clipboard.readText().trim();
 
-      if (currentText !== this.#lastClipboardText && currentText.startsWith(this.#config.prefix)) {
-        this.#lastClipboardText = currentText;
-        const textWithoutPrefix = currentText.slice(this.#config.prefix.length);
+      if (currentText !== this.#lastClipboardText) {
+        const matchedPrefix = this.#config.prefixes.find(prefix => currentText.startsWith(prefix));
 
-        const mainWindow = BrowserWindow.getAllWindows().find(w => !w.isDestroyed());
-        if (mainWindow) {
-          if (mainWindow.isMinimized()) {
-            mainWindow.restore();
+        if (matchedPrefix) {
+          this.#lastClipboardText = currentText;
+          const textWithoutPrefix = currentText.slice(matchedPrefix.length);
+
+          const mainWindow = BrowserWindow.getAllWindows().find(w => !w.isDestroyed());
+          if (mainWindow) {
+            if (mainWindow.isMinimized()) {
+              mainWindow.restore();
+            }
+            if (!mainWindow.isVisible()) {
+              mainWindow.setAlwaysOnTop(true);
+              mainWindow.show();
+              mainWindow.setAlwaysOnTop(false);
+              forceFocus.focusWindow(mainWindow);
+            } else {
+              forceFocus.focusWindow(mainWindow);
+            }
+            mainWindow.webContents.send('clipboard-text-detected', {
+              originalText: textWithoutPrefix,
+              fullText: currentText,
+              prefix: matchedPrefix
+            });
           }
-          if (!mainWindow.isVisible()) {
-            mainWindow.setAlwaysOnTop(true);
-            mainWindow.show();
-            mainWindow.setAlwaysOnTop(false);
-            // 使用 forcefocus 强制获得焦点
-            forceFocus.focusWindow(mainWindow);
-          } else {
-            forceFocus.focusWindow(mainWindow);
-          }
-          mainWindow.webContents.send('clipboard-text-detected', {
-            originalText: textWithoutPrefix,
-            fullText: currentText
-          });
+        } else {
+          this.#lastClipboardText = currentText;
         }
-      } else if (currentText !== this.#lastClipboardText) {
-        this.#lastClipboardText = currentText;
       }
     }, 1000);
   }

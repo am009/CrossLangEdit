@@ -9,9 +9,10 @@ function send(channel: string, message: string) {
 const clipboard = {
   startMonitoring: () => ipcRenderer.invoke('clipboard-start-monitoring'),
   stopMonitoring: () => ipcRenderer.invoke('clipboard-stop-monitoring'),
+  updatePrefixes: (prefixes: string[]) => ipcRenderer.invoke('clipboard-update-prefixes', prefixes),
   writeText: (text: string) => ipcRenderer.invoke('clipboard-write-text', text),
-  onTextDetected: (callback: (data: {originalText: string, fullText: string}) => void) => {
-    const handler = (_: any, data: {originalText: string, fullText: string}) => callback(data);
+  onTextDetected: (callback: (data: {originalText: string, fullText: string, prefix?: string}) => void) => {
+    const handler = (_: any, data: {originalText: string, fullText: string, prefix?: string}) => callback(data);
     ipcRenderer.on('clipboard-text-detected', handler);
     return () => ipcRenderer.off('clipboard-text-detected', handler);
   }
