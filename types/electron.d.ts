@@ -8,7 +8,7 @@ declare global {
         onTextDetected: (callback: (data: {originalText: string, fullText: string}) => void) => () => void;
       };
       window: {
-        minimize: () => Promise<boolean>;
+        hide: () => Promise<boolean>;
       };
     };
   }

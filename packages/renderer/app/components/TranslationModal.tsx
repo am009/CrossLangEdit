@@ -65,9 +65,9 @@ export const TranslationModal: React.FC<TranslationModalProps> = ({
     }
     onClose();
 
-    // 最小化窗口
-    if (window.electronAPI?.window?.minimize) {
-      await window.electronAPI.window.minimize();
+    // 隐藏窗口
+    if (window.electronAPI?.window?.hide) {
+      await window.electronAPI.window.hide();
     }
   };
 

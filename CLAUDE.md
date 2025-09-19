@@ -11,14 +11,17 @@ CrossLangEdit 是一个基于 Electron + Vite + React Router 的跨语言编辑�
 - **AI 翻译**：集成大模型 API（如 OpenAI GPT）进行智能翻译
 - **便捷操作**：支持 ESC 快捷键退出，自动复制翻译结果
 - **灵活配置**：可自定义 API 端点、密钥和翻译提示词
+- **托盘图标**：应用启动后在系统托盘显示图标，支持后台运行
+- **窗口管理**：默认隐藏窗口，需要时弹出，关闭时隐藏而不退出
 
 ### 使用流程
 
-1. 启动应用并开始监听剪切板
+1. 启动应用，自动隐藏到系统托盘并开始监听剪切板
 2. 复制以 `#zh:` 开头的文本（如：`#zh:Hello World`）
 3. 应用自动弹出翻译界面，显示去除前缀后的原文（`Hello World`）
 4. 点击翻译按钮，使用配置的 API 进行翻译
-5. 按 ESC 或点击完成按钮，自动将 `#zh:原文` 和翻译结果复制到剪切板
+5. 按 ESC 或点击完成按钮，自动将 `#zh:原文` 和翻译结果复制到剪切板，窗口隐藏
+6. 通过托盘图标右键菜单可以显示窗口或退出应用
 
 ## 技术栈
 
@@ -36,7 +39,9 @@ packages/
 │   └── src/
 │       ├── index.ts      # 主入口文件
 │       └── modules/
-│           └── ClipboardMonitor.ts  # 剪切板监听模块
+│           ├── ClipboardMonitor.ts     # 剪切板监听模块
+│           ├── TrayManager.ts          # 托盘图标管理模块
+│           └── TrayControlledTerminator.ts  # 托盘控制的应用退出模块
 ├── preload/              # Electron 预加载脚本
 │   └── src/
 │       └── index.ts      # 预加载脚本，暴露安全的 API
@@ -59,7 +64,7 @@ packages/
 ### 主进程相关
 
 #### packages/main/src/index.ts
-主进程入口文件，初始化所有应用模块，包括剪切板监听模块。
+主进程入口文件，初始化所有应用模块，包括剪切板监听模块、托盘管理器和应用退出控制。
 
 #### packages/main/src/modules/ClipboardMonitor.ts
 剪切板监听模块，负责：
@@ -67,6 +72,20 @@ packages/
 - 检测指定前缀（`#zh:`）的文本
 - 通过 IPC 通信将检测结果发送给渲染进程
 - 提供启动/停止监听和写入剪切板的 API
+- 提供窗口隐藏功能
+
+#### packages/main/src/modules/TrayManager.ts
+托盘图标管理模块，负责：
+- 在系统托盘创建应用图标
+- 提供右键菜单（显示窗口、退出应用）
+- 支持双击托盘图标显示窗口
+- 管理托盘图标的生命周期
+
+#### packages/main/src/modules/TrayControlledTerminator.ts
+托盘控制的应用退出模块，负责：
+- 阻止窗口关闭时自动退出应用
+- 只允许通过托盘菜单退出应用
+- 处理不同平台的窗口关闭行为
 
 ### 预加载脚本
 
@@ -75,6 +94,7 @@ packages/
 - 剪切板监听控制
 - 剪切板写入功能
 - 文本检测事件监听
+- 窗口隐藏功能
 
 ### 渲染进程相关
 
@@ -91,6 +111,7 @@ packages/
 - 翻译按钮和进度状态
 - ESC 快捷键支持
 - 自动复制翻译结果
+- 翻译完成后隐藏窗口
 
 #### packages/renderer/app/components/SettingsModal.tsx
 设置界面模态框，可配置：

@@ -18,7 +18,7 @@ const clipboard = {
 };
 
 const window = {
-  minimize: () => ipcRenderer.invoke('window-minimize')
+  hide: () => ipcRenderer.invoke('window-hide')
 };
 
 // 使用 contextBridge 安全地暴露 API

@@ -16,7 +16,7 @@ class WindowManager implements AppModule {
 
   async enable({app}: ModuleContext): Promise<void> {
     await app.whenReady();
-    await this.restoreOrCreateWindow(true);
+    await this.restoreOrCreateWindow(false); // 默认不显示窗口
     app.on('second-instance', () => this.restoreOrCreateWindow(true));
     app.on('activate', () => this.restoreOrCreateWindow(true));
   }
@@ -32,6 +32,12 @@ class WindowManager implements AppModule {
         webviewTag: false, // The webview tag is not recommended. Consider alternatives like an iframe or Electron's BrowserView. @see https://www.electronjs.org/docs/latest/api/webview-tag#warning
         preload: this.#preload.path,
       },
+    });
+
+    // 阻止窗口关闭，改为隐藏
+    browserWindow.on('close', (event) => {
+      event.preventDefault();
+      browserWindow.hide();
     });
 
     if (this.#renderer instanceof URL) {

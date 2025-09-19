@@ -40,10 +40,10 @@ export class ClipboardMonitor implements AppModule {
       return true;
     });
 
-    ipcMain.handle('window-minimize', () => {
+    ipcMain.handle('window-hide', () => {
       const mainWindow = BrowserWindow.getAllWindows().find(w => !w.isDestroyed());
       if (mainWindow) {
-        mainWindow.minimize();
+        mainWindow.hide();
         return true;
       }
       return false;
@@ -54,7 +54,7 @@ export class ClipboardMonitor implements AppModule {
     if (!this.#config.enabled || this.#intervalId) return;
 
     this.#intervalId = setInterval(() => {
-      const currentText = clipboard.readText();
+      const currentText = clipboard.readText().trim();
 
       if (currentText !== this.#lastClipboardText && currentText.startsWith(this.#config.prefix)) {
         this.#lastClipboardText = currentText;
@@ -65,7 +65,9 @@ export class ClipboardMonitor implements AppModule {
           if (mainWindow.isMinimized()) {
             mainWindow.restore();
           }
-          mainWindow.show();
+          if (!mainWindow.isVisible()) {
+            mainWindow.show();
+          }
           mainWindow.focus();
           mainWindow.webContents.send('clipboard-text-detected', {
             originalText: textWithoutPrefix,
