@@ -17,12 +17,14 @@ export const TranslationModal: React.FC<TranslationModalProps> = ({
   onCopyResult,
   onOpenSettings
 }) => {
+  const [editableOriginalText, setEditableOriginalText] = useState('');
   const [translatedText, setTranslatedText] = useState('');
   const [isTranslating, setIsTranslating] = useState(false);
   const [error, setError] = useState('');
 
   useEffect(() => {
     if (isOpen) {
+      setEditableOriginalText(originalText);
       setTranslatedText('');
       setError('');
     }
@@ -42,13 +44,13 @@ export const TranslationModal: React.FC<TranslationModalProps> = ({
   }, [isOpen]);
 
   const handleTranslate = async () => {
-    if (!originalText.trim()) return;
+    if (!editableOriginalText.trim()) return;
 
     setIsTranslating(true);
     setError('');
 
     try {
-      const result = await onTranslate(originalText);
+      const result = await onTranslate(editableOriginalText);
       setTranslatedText(result);
     } catch (err) {
       setError(err instanceof Error ? err.message : '翻译失败');
@@ -59,7 +61,7 @@ export const TranslationModal: React.FC<TranslationModalProps> = ({
 
   const handleClose = async () => {
     if (translatedText) {
-      onCopyResult(originalText, translatedText);
+      onCopyResult(editableOriginalText, translatedText);
     }
     onClose();
 
@@ -99,9 +101,9 @@ export const TranslationModal: React.FC<TranslationModalProps> = ({
               原文:
             </label>
             <textarea
-              value={originalText}
-              readOnly
-              className="w-full p-3 border rounded-md bg-gray-50 resize-none"
+              value={editableOriginalText}
+              onChange={(e) => setEditableOriginalText(e.target.value)}
+              className="w-full p-3 border rounded-md resize-none"
               rows={3}
             />
           </div>
@@ -112,9 +114,9 @@ export const TranslationModal: React.FC<TranslationModalProps> = ({
             </label>
             <textarea
               value={translatedText}
+              onChange={(e) => setTranslatedText(e.target.value)}
               placeholder={isTranslating ? "翻译中..." : "点击翻译按钮获取译文"}
-              readOnly
-              className="w-full p-3 border rounded-md bg-gray-50 resize-none"
+              className="w-full p-3 border rounded-md resize-none"
               rows={3}
             />
           </div>
@@ -126,7 +128,7 @@ export const TranslationModal: React.FC<TranslationModalProps> = ({
           <div className="flex gap-2 justify-end">
             <button
               onClick={handleTranslate}
-              disabled={isTranslating || !originalText.trim()}
+              disabled={isTranslating || !editableOriginalText.trim()}
               className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
             >
               {isTranslating ? '翻译中...' : '翻译'}
