@@ -35,6 +35,7 @@ export class TrayManager implements AppModule {
         label: '退出',
         click: () => {
           app.quit();
+          app.exit();
         }
       }
     ]);
