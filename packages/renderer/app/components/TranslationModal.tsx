@@ -3,6 +3,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 interface TranslationModalProps {
   isOpen: boolean;
   originalText: string;
+  translatedText?: string;
   onClose: () => void;
   onTranslate: (text: string) => Promise<string>;
   onCopyResult: (originalText: string, translatedText: string) => void;
@@ -12,6 +13,7 @@ interface TranslationModalProps {
 export const TranslationModal: React.FC<TranslationModalProps> = ({
   isOpen,
   originalText,
+  translatedText: initialTranslatedText,
   onClose,
   onTranslate,
   onCopyResult,
@@ -25,10 +27,10 @@ export const TranslationModal: React.FC<TranslationModalProps> = ({
   useEffect(() => {
     if (isOpen) {
       setEditableOriginalText(originalText);
-      setTranslatedText('');
+      setTranslatedText(initialTranslatedText || '');
       setError('');
     }
-  }, [isOpen, originalText]);
+  }, [isOpen, originalText, initialTranslatedText]);
 
   const handleClose = useCallback(async () => {
     if (translatedText) {

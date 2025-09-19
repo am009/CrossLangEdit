@@ -69,6 +69,9 @@ export class ClipboardMonitor implements AppModule {
           this.#lastClipboardText = currentText;
           const textWithoutPrefix = currentText.slice(matchedPrefix.length);
 
+          // 按行解析剪切板内容
+          const parsedContent = this.#parseContentByLines(currentText);
+
           const mainWindow = BrowserWindow.getAllWindows().find(w => !w.isDestroyed());
           if (mainWindow) {
             if (mainWindow.isMinimized()) {
@@ -83,9 +86,12 @@ export class ClipboardMonitor implements AppModule {
               forceFocus.focusWindow(mainWindow);
             }
             mainWindow.webContents.send('clipboard-text-detected', {
-              originalText: textWithoutPrefix,
+              originalText: parsedContent.originalLines.join('\n'),
+              translatedText: parsedContent.translatedLines.join('\n'),
               fullText: currentText,
-              prefix: matchedPrefix
+              prefix: matchedPrefix,
+              hasOriginalText: parsedContent.hasOriginalText,
+              hasTranslatedText: parsedContent.hasTranslatedText
             });
           }
         } else {
@@ -93,6 +99,34 @@ export class ClipboardMonitor implements AppModule {
         }
       }
     }, 1000);
+  }
+
+  #parseContentByLines(content: string) {
+    const lines = content.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+    const originalLines: string[] = [];
+    const translatedLines: string[] = [];
+
+    for (const line of lines) {
+      const matchedPrefix = this.#config.prefixes.find(prefix => line.startsWith(prefix));
+
+      if (matchedPrefix) {
+        // 有前缀的行，去掉前缀后作为原文
+        const textWithoutPrefix = line.slice(matchedPrefix.length).trim();
+        if (textWithoutPrefix) {
+          originalLines.push(textWithoutPrefix);
+        }
+      } else {
+        // 没有前缀的行作为译文
+        translatedLines.push(line);
+      }
+    }
+
+    return {
+      originalLines,
+      translatedLines,
+      hasOriginalText: originalLines.length > 0,
+      hasTranslatedText: translatedLines.length > 0
+    };
   }
 
   #stopMonitoring() {

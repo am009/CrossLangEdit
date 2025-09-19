@@ -34,6 +34,7 @@ export const CrossLangEdit: React.FC = () => {
   const [isTranslationModalOpen, setIsTranslationModalOpen] = useState(false);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   const [currentText, setCurrentText] = useState('');
+  const [currentTranslatedText, setCurrentTranslatedText] = useState('');
   const [currentPrefix, setCurrentPrefix] = useState<string>('');
   const [isMonitoring, setIsMonitoring] = useState(false);
   const [isClient, setIsClient] = useState(false);
@@ -63,7 +64,8 @@ export const CrossLangEdit: React.FC = () => {
 
     const unsubscribe = window.electronAPI.clipboard.onTextDetected((data) => {
       if (settings.enabled) {
-        setCurrentText(data.originalText);
+        setCurrentText(data.originalText || '');
+        setCurrentTranslatedText(data.translatedText || '');
         setCurrentPrefix(data.prefix || '');
         setIsTranslationModalOpen(true);
       }
@@ -108,7 +110,14 @@ export const CrossLangEdit: React.FC = () => {
   const handleCopyResult = async (originalText: string, translatedText: string) => {
     if (!isClient || !window.electronAPI?.clipboard) return;
 
-    const result = `${currentPrefix}${originalText}\n\n${translatedText}`;
+    // 处理多行原文，每行都加上前缀
+    const originalLines = originalText.split('\n').filter(line => line.trim());
+    const prefixedOriginalLines = originalLines.map(line => `${currentPrefix}${line.trim()}`);
+
+    // 处理多行译文
+    const translatedLines = translatedText.split('\n').filter(line => line.trim());
+
+    const result = [...prefixedOriginalLines, ...translatedLines].join('\n');
     try {
       await window.electronAPI.clipboard.writeText(result);
     } catch (error) {
@@ -217,6 +226,7 @@ export const CrossLangEdit: React.FC = () => {
           <TranslationModal
             isOpen={isTranslationModalOpen}
             originalText={currentText}
+            translatedText={currentTranslatedText}
             onClose={() => setIsTranslationModalOpen(false)}
             onTranslate={handleTranslate}
             onCopyResult={handleCopyResult}

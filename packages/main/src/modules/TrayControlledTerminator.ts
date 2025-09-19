@@ -1,14 +1,15 @@
 import {AppModule} from '../AppModule.js';
 import {ModuleContext} from '../ModuleContext.js';
+import {Event} from 'electron';
 
 class TrayControlledTerminator implements AppModule {
   enable({app}: ModuleContext): Promise<void> | void {
     // 阻止默认的窗口关闭行为导致应用退出
-    app.on('window-all-closed', (event) => {
+    app.on('window-all-closed', () => {
       // 在 macOS 上，除非用户用 Cmd + Q 退出，否则应用和菜单栏会保持活跃状态
       if (process.platform !== 'darwin') {
         // 在其他平台上，不自动退出，让托盘控制退出
-        event.preventDefault();
+        // 阻止应用退出
       }
     });
 
