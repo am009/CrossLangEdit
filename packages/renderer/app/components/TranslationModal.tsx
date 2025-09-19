@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 
 interface TranslationModalProps {
   isOpen: boolean;
@@ -30,18 +30,41 @@ export const TranslationModal: React.FC<TranslationModalProps> = ({
     }
   }, [isOpen, originalText]);
 
+  const handleClose = useCallback(async () => {
+    if (translatedText) {
+      onCopyResult(editableOriginalText, translatedText);
+    }
+    onClose();
+
+    // 隐藏窗口
+    if (window.electronAPI?.window?.hide) {
+      await window.electronAPI.window.hide();
+    }
+  }, [translatedText, editableOriginalText, onCopyResult, onClose]);
+
   useEffect(() => {
+    // console.log('TranslationModal isOpen changed:', isOpen);
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         handleClose();
       }
     };
 
+    const handleWindowBlur = () => {
+      handleClose();
+    };
+
     if (isOpen) {
+      // console.log('Adding event listeners for translation modal');
       document.addEventListener('keydown', handleKeyDown);
-      return () => document.removeEventListener('keydown', handleKeyDown);
+      window.addEventListener('blur', handleWindowBlur);
+      return () => {
+        // console.log('Removing event listeners for translation modal');
+        document.removeEventListener('keydown', handleKeyDown);
+        window.removeEventListener('blur', handleWindowBlur);
+      };
     }
-  }, [isOpen]);
+  }, [isOpen, handleClose]);
 
   const handleTranslate = async () => {
     if (!editableOriginalText.trim()) return;
@@ -56,18 +79,6 @@ export const TranslationModal: React.FC<TranslationModalProps> = ({
       setError(err instanceof Error ? err.message : '翻译失败');
     } finally {
       setIsTranslating(false);
-    }
-  };
-
-  const handleClose = async () => {
-    if (translatedText) {
-      onCopyResult(editableOriginalText, translatedText);
-    }
-    onClose();
-
-    // 隐藏窗口
-    if (window.electronAPI?.window?.hide) {
-      await window.electronAPI.window.hide();
     }
   };
 

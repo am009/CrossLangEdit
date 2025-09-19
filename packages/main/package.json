@@ -14,7 +14,8 @@
   "dependencies": {
     "@app/preload": "*",
     "@app/renderer": "*",
-    "electron-updater": "6.6.2"
+    "electron-updater": "6.6.2",
+    "forcefocus": "^1.1.0"
   },
   "devDependencies": {
     "@app/electron-versions": "*",

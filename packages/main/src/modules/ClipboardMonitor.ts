@@ -1,6 +1,7 @@
 import {clipboard, BrowserWindow, ipcMain} from 'electron';
 import {AppModule} from '../AppModule.js';
 import {ModuleContext} from '../ModuleContext.js';
+import forceFocus from 'forcefocus';
 
 export interface ClipboardMonitorConfig {
   enabled: boolean;
@@ -66,9 +67,14 @@ export class ClipboardMonitor implements AppModule {
             mainWindow.restore();
           }
           if (!mainWindow.isVisible()) {
+            mainWindow.setAlwaysOnTop(true);
             mainWindow.show();
+            mainWindow.setAlwaysOnTop(false);
+            // 使用 forcefocus 强制获得焦点
+            forceFocus.focusWindow(mainWindow);
+          } else {
+            forceFocus.focusWindow(mainWindow);
           }
-          mainWindow.focus();
           mainWindow.webContents.send('clipboard-text-detected', {
             originalText: textWithoutPrefix,
             fullText: currentText

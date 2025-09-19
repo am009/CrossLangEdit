@@ -24,7 +24,7 @@ class WindowManager implements AppModule {
   async createWindow(): Promise<BrowserWindow> {
     const browserWindow = new BrowserWindow({
       show: false, // Use the 'ready-to-show' event to show the instantiated BrowserWindow.
-      alwaysOnTop: true, // 保持窗口始终在最前面
+      // alwaysOnTop: true, // 保持窗口始终在最前面
       webPreferences: {
         nodeIntegration: false,
         contextIsolation: true,

@@ -6,3 +6,11 @@
 - Esc退出后，自动复制加上前缀的原文和翻译后文本。
 
 然后有设置按钮，可以自定义设置API端点，prompt等。
+
+### Dev
+
+因为使用了forcefocus包辅助聚焦窗口，所以需要为electron执行electron-rebuild。
+
+```
+.\node_modules\.bin\electron-rebuild.cmd
+```
