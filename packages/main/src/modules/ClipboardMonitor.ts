@@ -39,6 +39,15 @@ export class ClipboardMonitor implements AppModule {
       this.#lastClipboardText = text;
       return true;
     });
+
+    ipcMain.handle('window-minimize', () => {
+      const mainWindow = BrowserWindow.getAllWindows().find(w => !w.isDestroyed());
+      if (mainWindow) {
+        mainWindow.minimize();
+        return true;
+      }
+      return false;
+    });
   }
 
   #startMonitoring() {
@@ -51,9 +60,14 @@ export class ClipboardMonitor implements AppModule {
         this.#lastClipboardText = currentText;
         const textWithoutPrefix = currentText.slice(this.#config.prefix.length);
 
-        const focusedWindow = BrowserWindow.getFocusedWindow();
-        if (focusedWindow) {
-          focusedWindow.webContents.send('clipboard-text-detected', {
+        const mainWindow = BrowserWindow.getAllWindows().find(w => !w.isDestroyed());
+        if (mainWindow) {
+          if (mainWindow.isMinimized()) {
+            mainWindow.restore();
+          }
+          mainWindow.show();
+          mainWindow.focus();
+          mainWindow.webContents.send('clipboard-text-detected', {
             originalText: textWithoutPrefix,
             fullText: currentText
           });

@@ -17,9 +17,14 @@ const clipboard = {
   }
 };
 
+const window = {
+  minimize: () => ipcRenderer.invoke('window-minimize')
+};
+
 // 使用 contextBridge 安全地暴露 API
 contextBridge.exposeInMainWorld('electronAPI', {
-  clipboard
+  clipboard,
+  window
 });
 
 export {sha256sum, versions, send, clipboard};

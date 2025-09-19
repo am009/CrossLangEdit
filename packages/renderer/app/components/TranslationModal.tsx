@@ -55,11 +55,16 @@ export const TranslationModal: React.FC<TranslationModalProps> = ({
     }
   };
 
-  const handleClose = () => {
+  const handleClose = async () => {
     if (translatedText) {
       onCopyResult(originalText, translatedText);
     }
     onClose();
+
+    // 最小化窗口
+    if (window.electronAPI?.window?.minimize) {
+      await window.electronAPI.window.minimize();
+    }
   };
 
   if (!isOpen) return null;

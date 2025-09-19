@@ -7,6 +7,9 @@ declare global {
         writeText: (text: string) => Promise<boolean>;
         onTextDetected: (callback: (data: {originalText: string, fullText: string}) => void) => () => void;
       };
+      window: {
+        minimize: () => Promise<boolean>;
+      };
     };
   }
 }
