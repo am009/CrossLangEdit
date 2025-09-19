@@ -6,7 +6,7 @@
   "type": "module",
   "author": {
     "email": "kozackunisoft@gmail.com",
-    "name": "Alex Kozack",
+    "name": "Alex",
     "url": "https://kozack.me"
   },
   "main": "packages/entry-point.mjs",
