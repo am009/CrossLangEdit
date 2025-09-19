@@ -196,6 +196,7 @@ export const CrossLangEdit: React.FC = () => {
             onClose={() => setIsTranslationModalOpen(false)}
             onTranslate={handleTranslate}
             onCopyResult={handleCopyResult}
+            onOpenSettings={() => setIsSettingsModalOpen(true)}
           />
 
           <SettingsModal

@@ -6,6 +6,7 @@ interface TranslationModalProps {
   onClose: () => void;
   onTranslate: (text: string) => Promise<string>;
   onCopyResult: (originalText: string, translatedText: string) => void;
+  onOpenSettings: () => void;
 }
 
 export const TranslationModal: React.FC<TranslationModalProps> = ({
@@ -13,7 +14,8 @@ export const TranslationModal: React.FC<TranslationModalProps> = ({
   originalText,
   onClose,
   onTranslate,
-  onCopyResult
+  onCopyResult,
+  onOpenSettings
 }) => {
   const [translatedText, setTranslatedText] = useState('');
   const [isTranslating, setIsTranslating] = useState(false);
@@ -74,12 +76,21 @@ export const TranslationModal: React.FC<TranslationModalProps> = ({
       <div className="bg-white rounded-lg p-6 w-96 max-w-[90vw] shadow-xl">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-lg font-semibold">翻译</h2>
-          <button
-            onClick={handleClose}
-            className="text-gray-500 hover:text-gray-700 text-xl"
-          >
-            ×
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={onOpenSettings}
+              className="text-gray-500 hover:text-gray-700 text-sm px-2 py-1 rounded hover:bg-gray-100"
+              title="设置"
+            >
+              ⚙️
+            </button>
+            <button
+              onClick={handleClose}
+              className="text-gray-500 hover:text-gray-700 text-xl"
+            >
+              ×
+            </button>
+          </div>
         </div>
 
         <div className="space-y-4">
