@@ -1,9 +1,25 @@
 import {sha256sum} from './nodeCrypto.js';
 import {versions} from './versions.js';
-import {ipcRenderer} from 'electron';
+import {ipcRenderer, contextBridge} from 'electron';
 
 function send(channel: string, message: string) {
   return ipcRenderer.invoke(channel, message);
 }
 
-export {sha256sum, versions, send};
+const clipboard = {
+  startMonitoring: () => ipcRenderer.invoke('clipboard-start-monitoring'),
+  stopMonitoring: () => ipcRenderer.invoke('clipboard-stop-monitoring'),
+  writeText: (text: string) => ipcRenderer.invoke('clipboard-write-text', text),
+  onTextDetected: (callback: (data: {originalText: string, fullText: string}) => void) => {
+    const handler = (_: any, data: {originalText: string, fullText: string}) => callback(data);
+    ipcRenderer.on('clipboard-text-detected', handler);
+    return () => ipcRenderer.off('clipboard-text-detected', handler);
+  }
+};
+
+// 使用 contextBridge 安全地暴露 API
+contextBridge.exposeInMainWorld('electronAPI', {
+  clipboard
+});
+
+export {sha256sum, versions, send, clipboard};
