@@ -22,7 +22,7 @@ export class TranslationService {
   }
 
   private buildOpenAIPayload(apiConfig: ApiConfig, text: string, prompt: string) {
-    return {
+    const payload: any = {
       model: apiConfig.model,
       messages: [
         {
@@ -30,13 +30,18 @@ export class TranslationService {
           content: `${prompt}\n\n${text}`
         }
       ],
-      temperature: apiConfig.temperature,
       max_tokens: 1000
     };
+
+    if (apiConfig.temperature !== undefined) {
+      payload.temperature = apiConfig.temperature;
+    }
+
+    return payload;
   }
 
   private buildOllamaPayload(apiConfig: ApiConfig, text: string, prompt: string) {
-    return {
+    const payload: any = {
       model: apiConfig.model,
       messages: [
         {
@@ -44,11 +49,16 @@ export class TranslationService {
           content: `${prompt}\n\n${text}`
         }
       ],
-      stream: false,
-      options: {
-        temperature: apiConfig.temperature
-      }
+      stream: false
     };
+
+    if (apiConfig.temperature !== undefined) {
+      payload.options = {
+        temperature: apiConfig.temperature
+      };
+    }
+
+    return payload;
   }
 
   private buildHeaders(apiConfig: ApiConfig) {

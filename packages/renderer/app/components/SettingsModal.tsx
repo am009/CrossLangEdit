@@ -9,7 +9,7 @@ export interface ApiConfig {
   endpoint: string;
   apiKey: string;
   model: string;
-  temperature: number;
+  temperature?: number;
 }
 
 export interface PrefixConfig {
@@ -40,8 +40,7 @@ const defaultApiConfig: ApiConfig = {
   type: 'openai',
   endpoint: 'https://api.openai.com/v1/chat/completions',
   apiKey: '',
-  model: 'gpt-3.5-turbo',
-  temperature: 0.3
+  model: 'gpt-3.5-turbo'
 };
 
 const defaultPrefixConfig: PrefixConfig = {
@@ -104,8 +103,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
       type: 'openai',
       endpoint: 'https://api.openai.com/v1/chat/completions',
       apiKey: '',
-      model: 'gpt-3.5-turbo',
-      temperature: 0.3
+      model: 'gpt-3.5-turbo'
     };
     setLocalSettings(prev => ({
       ...prev,
@@ -351,16 +349,19 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Temperature:
+                          Temperature (可选):
                         </label>
                         <input
                           type="number"
                           min="0"
                           max="2"
                           step="0.1"
-                          value={config.temperature}
-                          onChange={(e) => updateApiConfig(config.id, { temperature: parseFloat(e.target.value) })}
+                          value={config.temperature ?? ''}
+                          onChange={(e) => updateApiConfig(config.id, {
+                            temperature: e.target.value === '' ? undefined : parseFloat(e.target.value)
+                          })}
                           className="w-full p-2 border rounded text-sm"
+                          placeholder="留空使用默认值"
                         />
                       </div>
                     </div>
