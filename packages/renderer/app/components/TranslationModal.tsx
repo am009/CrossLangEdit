@@ -7,7 +7,7 @@ interface TranslationModalProps {
   copyTranslationOnly?: boolean;
   closeOnBlur?: boolean;
   onClose: () => void;
-  onTranslate: (text: string) => Promise<string>;
+  onTranslate: (text: string, onChunk?: (chunk: string) => void) => Promise<string>;
   onCopyResult: (originalText: string, translatedText: string, copyTranslationOnly: boolean) => void;
   onOpenSettings: () => void;
   onCopyTranslationOnlyChange?: (value: boolean) => void;
@@ -83,10 +83,18 @@ export const TranslationModal: React.FC<TranslationModalProps> = ({
 
     setIsTranslating(true);
     setError('');
+    setTranslatedText(''); // Clear previous translation
 
     try {
-      const result = await onTranslate(editableOriginalText);
-      setTranslatedText(result);
+      let fullTranslation = '';
+      const result = await onTranslate(editableOriginalText, (chunk) => {
+        fullTranslation += chunk;
+        setTranslatedText(fullTranslation);
+      });
+      // If onTranslate returns non-empty result, use it (for backward compatibility)
+      if (result) {
+        setTranslatedText(result);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : '翻译失败');
     } finally {

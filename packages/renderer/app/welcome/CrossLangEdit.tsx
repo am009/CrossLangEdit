@@ -104,8 +104,15 @@ export const CrossLangEdit: React.FC = () => {
     }
   };
 
-  const handleTranslate = async (text: string): Promise<string> => {
-    return await translationService.translate(text, currentPrefix);
+  const handleTranslate = async (text: string, onChunk?: (chunk: string) => void): Promise<string> => {
+    if (onChunk) {
+      // Use streaming API
+      await translationService.translateStream(text, onChunk, currentPrefix);
+      return ''; // Return empty string as the content is handled via onChunk
+    } else {
+      // Fallback to non-streaming API
+      return await translationService.translate(text, currentPrefix);
+    }
   };
 
   const handleCopyResult = async (originalText: string, translatedText: string, copyTranslationOnly: boolean) => {
