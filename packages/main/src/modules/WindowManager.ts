@@ -16,7 +16,7 @@ class WindowManager implements AppModule {
 
   async enable({app}: ModuleContext): Promise<void> {
     await app.whenReady();
-    await this.restoreOrCreateWindow(false); // 默认不显示窗口
+    await this.restoreOrCreateWindow(true); // 启动时显示窗口
     app.on('second-instance', () => this.restoreOrCreateWindow(true));
     app.on('activate', () => this.restoreOrCreateWindow(true));
   }
