@@ -161,6 +161,13 @@ export class TranslationService {
       }
     }
 
+    // 打印 API 配置名称和完整的 prompt
+    const fullPrompt = `${prefixConfig.prompt}\n\n${text}`;
+    console.log('=== Translation Request (Stream) ===');
+    console.log('API Config Name:', apiConfig.name);
+    console.log('Full Prompt:', fullPrompt);
+    console.log('===================================');
+
     if (!apiConfig.endpoint) {
       throw new Error('请先配置 API 端点');
     }
@@ -230,6 +237,13 @@ export class TranslationService {
         throw new Error('默认 API 配置不存在');
       }
     }
+
+    // 打印 API 配置名称和完整的 prompt
+    const fullPrompt = `${prefixConfig.prompt}\n\n${text}`;
+    console.log('=== Translation Request ===');
+    console.log('API Config Name:', apiConfig.name);
+    console.log('Full Prompt:', fullPrompt);
+    console.log('===========================');
 
     if (!apiConfig.endpoint) {
       throw new Error('请先配置 API 端点');
