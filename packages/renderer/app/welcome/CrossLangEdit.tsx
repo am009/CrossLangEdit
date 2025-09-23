@@ -173,6 +173,34 @@ export const CrossLangEdit: React.FC = () => {
     StorageService.saveSettings(newSettings);
   };
 
+  // 如果翻译界面打开，显示翻译页面
+  if (isClient && isTranslationModalOpen) {
+    return (
+      <>
+        <TranslationModal
+          isOpen={isTranslationModalOpen}
+          originalText={currentText}
+          translatedText={currentTranslatedText}
+          copyTranslationOnly={settings.copyTranslationOnly}
+          closeOnBlur={settings.closeOnBlur}
+          onClose={() => setIsTranslationModalOpen(false)}
+          onTranslate={handleTranslate}
+          onCopyResult={handleCopyResult}
+          onOpenSettings={() => setIsSettingsModalOpen(true)}
+          onCopyTranslationOnlyChange={handleCopyTranslationOnlyChange}
+        />
+
+        <SettingsModal
+          isOpen={isSettingsModalOpen}
+          settings={settings}
+          onClose={() => setIsSettingsModalOpen(false)}
+          onSave={handleSettingsSave}
+        />
+      </>
+    );
+  }
+
+  // 默认显示主界面
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-md">
@@ -246,27 +274,12 @@ export const CrossLangEdit: React.FC = () => {
       </div>
 
       {isClient && (
-        <>
-          <TranslationModal
-            isOpen={isTranslationModalOpen}
-            originalText={currentText}
-            translatedText={currentTranslatedText}
-            copyTranslationOnly={settings.copyTranslationOnly}
-            closeOnBlur={settings.closeOnBlur}
-            onClose={() => setIsTranslationModalOpen(false)}
-            onTranslate={handleTranslate}
-            onCopyResult={handleCopyResult}
-            onOpenSettings={() => setIsSettingsModalOpen(true)}
-            onCopyTranslationOnlyChange={handleCopyTranslationOnlyChange}
-          />
-
-          <SettingsModal
-            isOpen={isSettingsModalOpen}
-            settings={settings}
-            onClose={() => setIsSettingsModalOpen(false)}
-            onSave={handleSettingsSave}
-          />
-        </>
+        <SettingsModal
+          isOpen={isSettingsModalOpen}
+          settings={settings}
+          onClose={() => setIsSettingsModalOpen(false)}
+          onSave={handleSettingsSave}
+        />
       )}
     </div>
   );

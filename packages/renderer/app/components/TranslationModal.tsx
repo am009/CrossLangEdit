@@ -105,58 +105,62 @@ export const TranslationModal: React.FC<TranslationModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-6 w-96 max-w-[90vw] shadow-xl">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-semibold">翻译</h2>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={onOpenSettings}
-              className="text-gray-500 hover:text-gray-700 text-sm px-2 py-1 rounded hover:bg-gray-100"
-              title="设置"
-            >
-              ⚙️
-            </button>
-            <button
-              onClick={handleClose}
-              className="text-gray-500 hover:text-gray-700 text-xl"
-            >
-              ×
-            </button>
-          </div>
+    <div className="h-screen flex flex-col bg-gray-50">
+      <div className="flex items-center justify-between px-6 py-4 bg-white border-b">
+        <h1 className="text-xl font-semibold">翻译工具</h1>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={onOpenSettings}
+            className="px-3 py-1.5 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-md transition-colors"
+            title="设置"
+          >
+            ⚙️ 设置
+          </button>
+          <button
+            onClick={handleClose}
+            className="px-3 py-1.5 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-md transition-colors"
+            title="关闭 (Esc)"
+          >
+            ✕ 关闭
+          </button>
         </div>
+      </div>
 
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+      <div className="flex-1 flex flex-col p-6 gap-6 overflow-y-auto">
+        <div className="flex-1 flex gap-6">
+          <div className="flex-1 flex flex-col">
+            <label className="text-sm font-medium text-gray-700 mb-2">
               原文:
             </label>
             <textarea
               value={editableOriginalText}
               onChange={(e) => setEditableOriginalText(e.target.value)}
-              className="w-full p-3 border rounded-md resize-none"
-              rows={3}
+              className="flex-1 w-full p-4 border border-gray-300 rounded-lg resize-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 font-mono text-sm"
+              placeholder="在这里输入或粘贴需要翻译的文本..."
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+          <div className="flex-1 flex flex-col">
+            <label className="text-sm font-medium text-gray-700 mb-2">
               译文:
             </label>
             <textarea
               value={translatedText}
               onChange={(e) => setTranslatedText(e.target.value)}
               placeholder={isTranslating ? "翻译中..." : "点击翻译按钮获取译文"}
-              className="w-full p-3 border rounded-md resize-none"
-              rows={3}
+              className="flex-1 w-full p-4 border border-gray-300 rounded-lg resize-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 font-mono text-sm"
             />
           </div>
+        </div>
 
-          {error && (
-            <div className="text-red-600 text-sm">{error}</div>
-          )}
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+            {error}
+          </div>
+        )}
 
-          <label className="flex items-center gap-2">
+        <div className="flex items-center justify-between bg-white p-4 rounded-lg border">
+          <label className="flex items-center gap-2 cursor-pointer">
             <input
               type="checkbox"
               checked={localCopyTranslationOnly}
@@ -165,22 +169,22 @@ export const TranslationModal: React.FC<TranslationModalProps> = ({
                 setLocalCopyTranslationOnly(newValue);
                 onCopyTranslationOnlyChange?.(newValue);
               }}
-              className="w-4 h-4"
+              className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
             />
             <span className="text-sm text-gray-700">仅复制译文</span>
           </label>
 
-          <div className="flex gap-2 justify-end">
+          <div className="flex gap-3">
             <button
               onClick={handleTranslate}
               disabled={isTranslating || !editableOriginalText.trim()}
-              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+              className="px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors font-medium"
             >
               {isTranslating ? '翻译中...' : '翻译'}
             </button>
             <button
               onClick={handleClose}
-              className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
+              className="px-6 py-2.5 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors font-medium"
             >
               完成 (Esc)
             </button>
