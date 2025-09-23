@@ -5,6 +5,7 @@ interface TranslationModalProps {
   originalText: string;
   translatedText?: string;
   copyTranslationOnly?: boolean;
+  closeOnBlur?: boolean;
   onClose: () => void;
   onTranslate: (text: string) => Promise<string>;
   onCopyResult: (originalText: string, translatedText: string, copyTranslationOnly: boolean) => void;
@@ -16,6 +17,7 @@ export const TranslationModal: React.FC<TranslationModalProps> = ({
   originalText,
   translatedText: initialTranslatedText,
   copyTranslationOnly = false,
+  closeOnBlur = false,
   onClose,
   onTranslate,
   onCopyResult,
@@ -57,7 +59,9 @@ export const TranslationModal: React.FC<TranslationModalProps> = ({
     };
 
     const handleWindowBlur = () => {
-      handleClose();
+      if (closeOnBlur) {
+        handleClose();
+      }
     };
 
     if (isOpen) {
@@ -70,7 +74,7 @@ export const TranslationModal: React.FC<TranslationModalProps> = ({
         window.removeEventListener('blur', handleWindowBlur);
       };
     }
-  }, [isOpen, handleClose]);
+  }, [isOpen, handleClose, closeOnBlur]);
 
   const handleTranslate = async () => {
     if (!editableOriginalText.trim()) return;

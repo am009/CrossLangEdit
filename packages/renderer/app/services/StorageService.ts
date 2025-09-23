@@ -23,6 +23,7 @@ const defaultPrefixConfig: PrefixConfig = {
 const defaultSettings: SettingsConfig = {
   enabled: true,
   copyTranslationOnly: false,
+  closeOnBlur: false,
   apiConfigs: [defaultApiConfig],
   prefixConfigs: [defaultPrefixConfig],
   defaultApiConfigId: 'default-openai'

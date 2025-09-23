@@ -236,6 +236,7 @@ export const CrossLangEdit: React.FC = () => {
             originalText={currentText}
             translatedText={currentTranslatedText}
             copyTranslationOnly={settings.copyTranslationOnly}
+            closeOnBlur={settings.closeOnBlur}
             onClose={() => setIsTranslationModalOpen(false)}
             onTranslate={handleTranslate}
             onCopyResult={handleCopyResult}

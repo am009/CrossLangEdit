@@ -23,6 +23,7 @@ export interface PrefixConfig {
 export interface SettingsConfig {
   enabled: boolean;
   copyTranslationOnly?: boolean;
+  closeOnBlur?: boolean;
   apiConfigs: ApiConfig[];
   prefixConfigs: PrefixConfig[];
   defaultApiConfigId?: string;
@@ -55,6 +56,7 @@ const defaultPrefixConfig: PrefixConfig = {
 const defaultSettings: SettingsConfig = {
   enabled: true,
   copyTranslationOnly: false,
+  closeOnBlur: false,
   apiConfigs: [defaultApiConfig],
   prefixConfigs: [defaultPrefixConfig],
   defaultApiConfigId: 'default-openai'
@@ -228,6 +230,16 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   className="w-4 h-4"
                 />
                 <span className="text-sm font-medium">仅复制译文</span>
+              </label>
+
+              <label className="flex items-center gap-2 mb-4">
+                <input
+                  type="checkbox"
+                  checked={localSettings.closeOnBlur || false}
+                  onChange={(e) => setLocalSettings(prev => ({ ...prev, closeOnBlur: e.target.checked }))}
+                  className="w-4 h-4"
+                />
+                <span className="text-sm font-medium">失去焦点时关闭窗口</span>
               </label>
             </div>
 
