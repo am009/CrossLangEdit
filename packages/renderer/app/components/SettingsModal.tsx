@@ -22,6 +22,7 @@ export interface PrefixConfig {
 
 export interface SettingsConfig {
   enabled: boolean;
+  copyTranslationOnly?: boolean;
   apiConfigs: ApiConfig[];
   prefixConfigs: PrefixConfig[];
   defaultApiConfigId?: string;
@@ -53,6 +54,7 @@ const defaultPrefixConfig: PrefixConfig = {
 
 const defaultSettings: SettingsConfig = {
   enabled: true,
+  copyTranslationOnly: false,
   apiConfigs: [defaultApiConfig],
   prefixConfigs: [defaultPrefixConfig],
   defaultApiConfigId: 'default-openai'
@@ -216,6 +218,16 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   className="w-4 h-4"
                 />
                 <span className="text-sm font-medium">启用剪切板监听</span>
+              </label>
+
+              <label className="flex items-center gap-2 mb-4">
+                <input
+                  type="checkbox"
+                  checked={localSettings.copyTranslationOnly || false}
+                  onChange={(e) => setLocalSettings(prev => ({ ...prev, copyTranslationOnly: e.target.checked }))}
+                  className="w-4 h-4"
+                />
+                <span className="text-sm font-medium">仅复制译文</span>
               </label>
             </div>
 

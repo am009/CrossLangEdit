@@ -4,9 +4,10 @@ interface TranslationModalProps {
   isOpen: boolean;
   originalText: string;
   translatedText?: string;
+  copyTranslationOnly?: boolean;
   onClose: () => void;
   onTranslate: (text: string) => Promise<string>;
-  onCopyResult: (originalText: string, translatedText: string) => void;
+  onCopyResult: (originalText: string, translatedText: string, copyTranslationOnly: boolean) => void;
   onOpenSettings: () => void;
 }
 
@@ -14,6 +15,7 @@ export const TranslationModal: React.FC<TranslationModalProps> = ({
   isOpen,
   originalText,
   translatedText: initialTranslatedText,
+  copyTranslationOnly = false,
   onClose,
   onTranslate,
   onCopyResult,
@@ -23,18 +25,20 @@ export const TranslationModal: React.FC<TranslationModalProps> = ({
   const [translatedText, setTranslatedText] = useState('');
   const [isTranslating, setIsTranslating] = useState(false);
   const [error, setError] = useState('');
+  const [localCopyTranslationOnly, setLocalCopyTranslationOnly] = useState(copyTranslationOnly);
 
   useEffect(() => {
     if (isOpen) {
       setEditableOriginalText(originalText);
       setTranslatedText(initialTranslatedText || '');
       setError('');
+      setLocalCopyTranslationOnly(copyTranslationOnly);
     }
-  }, [isOpen, originalText, initialTranslatedText]);
+  }, [isOpen, originalText, initialTranslatedText, copyTranslationOnly]);
 
   const handleClose = useCallback(async () => {
     if (translatedText) {
-      onCopyResult(editableOriginalText, translatedText);
+      onCopyResult(editableOriginalText, translatedText, localCopyTranslationOnly);
     }
     onClose();
 
@@ -42,7 +46,7 @@ export const TranslationModal: React.FC<TranslationModalProps> = ({
     if (window.electronAPI?.window?.hide) {
       await window.electronAPI.window.hide();
     }
-  }, [translatedText, editableOriginalText, onCopyResult, onClose]);
+  }, [translatedText, editableOriginalText, localCopyTranslationOnly, onCopyResult, onClose]);
 
   useEffect(() => {
     // console.log('TranslationModal isOpen changed:', isOpen);
@@ -137,6 +141,16 @@ export const TranslationModal: React.FC<TranslationModalProps> = ({
           {error && (
             <div className="text-red-600 text-sm">{error}</div>
           )}
+
+          <label className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              checked={localCopyTranslationOnly}
+              onChange={(e) => setLocalCopyTranslationOnly(e.target.checked)}
+              className="w-4 h-4"
+            />
+            <span className="text-sm text-gray-700">仅复制译文</span>
+          </label>
 
           <div className="flex gap-2 justify-end">
             <button

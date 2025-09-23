@@ -9,6 +9,7 @@ export const CrossLangEdit: React.FC = () => {
     if (typeof window === 'undefined') {
       return {
         enabled: true,
+        copyTranslationOnly: false,
         apiConfigs: [{
           id: 'default-openai',
           name: 'OpenAI GPT',
@@ -107,17 +108,24 @@ export const CrossLangEdit: React.FC = () => {
     return await translationService.translate(text, currentPrefix);
   };
 
-  const handleCopyResult = async (originalText: string, translatedText: string) => {
+  const handleCopyResult = async (originalText: string, translatedText: string, copyTranslationOnly: boolean) => {
     if (!isClient || !window.electronAPI?.clipboard) return;
 
-    // 处理多行原文，每行都加上前缀
-    const originalLines = originalText.split('\n').filter(line => line.trim());
-    const prefixedOriginalLines = originalLines.map(line => `${currentPrefix}${line.trim()}`);
+    let result: string;
+    if (copyTranslationOnly) {
+      // 仅复制译文
+      result = translatedText;
+    } else {
+      // 处理多行原文，每行都加上前缀
+      const originalLines = originalText.split('\n').filter(line => line.trim());
+      const prefixedOriginalLines = originalLines.map(line => `${currentPrefix}${line.trim()}`);
 
-    // 处理多行译文
-    const translatedLines = translatedText.split('\n').filter(line => line.trim());
+      // 处理多行译文
+      const translatedLines = translatedText.split('\n').filter(line => line.trim());
 
-    const result = [...prefixedOriginalLines, ...translatedLines].join('\n');
+      result = [...prefixedOriginalLines, ...translatedLines].join('\n');
+    }
+
     try {
       await window.electronAPI.clipboard.writeText(result);
     } catch (error) {
@@ -227,6 +235,7 @@ export const CrossLangEdit: React.FC = () => {
             isOpen={isTranslationModalOpen}
             originalText={currentText}
             translatedText={currentTranslatedText}
+            copyTranslationOnly={settings.copyTranslationOnly}
             onClose={() => setIsTranslationModalOpen(false)}
             onTranslate={handleTranslate}
             onCopyResult={handleCopyResult}

@@ -9,3 +9,5 @@
 
 ## TODO
 
+- 增加设置，“仅复制译文”的checkbox。
+- 发起请求时，在dev tools控制台打印出使用的API配置名称，和完整的prompt。
