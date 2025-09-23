@@ -157,6 +157,15 @@ export const CrossLangEdit: React.FC = () => {
     }
   };
 
+  const handleCopyTranslationOnlyChange = (value: boolean) => {
+    const newSettings = {
+      ...settings,
+      copyTranslationOnly: value
+    };
+    setSettings(newSettings);
+    StorageService.saveSettings(newSettings);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-md">
@@ -241,6 +250,7 @@ export const CrossLangEdit: React.FC = () => {
             onTranslate={handleTranslate}
             onCopyResult={handleCopyResult}
             onOpenSettings={() => setIsSettingsModalOpen(true)}
+            onCopyTranslationOnlyChange={handleCopyTranslationOnlyChange}
           />
 
           <SettingsModal

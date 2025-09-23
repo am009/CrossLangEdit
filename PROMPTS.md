@@ -11,3 +11,4 @@
 
 - 增加设置，“仅复制译文”的checkbox。
 - 发起请求时，在dev tools控制台打印出使用的API配置名称，和完整的prompt。
+- OpenAI和Ollama请求改成使用流式的输出。没必要使用非流式。

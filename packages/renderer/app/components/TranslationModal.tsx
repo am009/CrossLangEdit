@@ -10,6 +10,7 @@ interface TranslationModalProps {
   onTranslate: (text: string) => Promise<string>;
   onCopyResult: (originalText: string, translatedText: string, copyTranslationOnly: boolean) => void;
   onOpenSettings: () => void;
+  onCopyTranslationOnlyChange?: (value: boolean) => void;
 }
 
 export const TranslationModal: React.FC<TranslationModalProps> = ({
@@ -21,7 +22,8 @@ export const TranslationModal: React.FC<TranslationModalProps> = ({
   onClose,
   onTranslate,
   onCopyResult,
-  onOpenSettings
+  onOpenSettings,
+  onCopyTranslationOnlyChange
 }) => {
   const [editableOriginalText, setEditableOriginalText] = useState('');
   const [translatedText, setTranslatedText] = useState('');
@@ -150,7 +152,11 @@ export const TranslationModal: React.FC<TranslationModalProps> = ({
             <input
               type="checkbox"
               checked={localCopyTranslationOnly}
-              onChange={(e) => setLocalCopyTranslationOnly(e.target.checked)}
+              onChange={(e) => {
+                const newValue = e.target.checked;
+                setLocalCopyTranslationOnly(newValue);
+                onCopyTranslationOnlyChange?.(newValue);
+              }}
               className="w-4 h-4"
             />
             <span className="text-sm text-gray-700">仅复制译文</span>
