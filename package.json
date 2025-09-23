@@ -1,13 +1,12 @@
 {
-  "name": "root",
-  "description": "Secure boilerplate for Electron app based on Vite",
+  "name": "cross-lang-edit",
+  "description": "Pop translation when clipboard has special prefix",
   "version": "3.1.0",
   "private": true,
   "type": "module",
   "author": {
-    "email": "kozackunisoft@gmail.com",
-    "name": "Alex",
-    "url": "https://kozack.me"
+    "email": "am009@github.com",
+    "name": "am009"
   },
   "main": "packages/entry-point.mjs",
   "workspaces": [
