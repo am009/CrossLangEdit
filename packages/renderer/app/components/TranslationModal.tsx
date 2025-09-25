@@ -34,7 +34,10 @@ export const TranslationModal: React.FC<TranslationModalProps> = ({
   useEffect(() => {
     if (isOpen) {
       setEditableOriginalText(originalText);
-      setTranslatedText(initialTranslatedText || '');
+      // Only reset translatedText if it's different from what we already have
+      if (!translatedText && initialTranslatedText) {
+        setTranslatedText(initialTranslatedText);
+      }
       setError('');
       setLocalCopyTranslationOnly(copyTranslationOnly);
     }
