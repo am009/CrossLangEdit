@@ -9,6 +9,7 @@ import {allowExternalUrls} from './modules/ExternalUrls.js';
 import {createClipboardMonitorModule} from './modules/ClipboardMonitor.js';
 import {createTrayManagerModule} from './modules/TrayManager.js';
 import {createTrayControlledTerminator} from './modules/TrayControlledTerminator.js';
+import {createGlobalShortcutModule} from './modules/GlobalShortcut.js';
 
 
 export async function initApp(initConfig: AppInitConfig) {
@@ -20,6 +21,7 @@ export async function initApp(initConfig: AppInitConfig) {
     .init(hardwareAccelerationMode({enable: false}))
     .init(autoUpdater())
     .init(createClipboardMonitorModule({enabled: true, prefixes: ['#zh:']}))
+    .init(createGlobalShortcutModule({}))
 
     // Install DevTools extension if needed
     // .init(chromeDevToolsExtension({extension: 'VUEJS3_DEVTOOLS'}))

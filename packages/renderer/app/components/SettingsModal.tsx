@@ -24,6 +24,7 @@ export interface SettingsConfig {
   enabled: boolean;
   copyTranslationOnly?: boolean;
   closeOnBlur?: boolean;
+  globalShortcut?: string;
   apiConfigs: ApiConfig[];
   prefixConfigs: PrefixConfig[];
   defaultApiConfigId?: string;
@@ -57,6 +58,7 @@ const defaultSettings: SettingsConfig = {
   enabled: true,
   copyTranslationOnly: false,
   closeOnBlur: false,
+  globalShortcut: 'CommandOrControl+Shift+T',
   apiConfigs: [defaultApiConfig],
   prefixConfigs: [defaultPrefixConfig],
   defaultApiConfigId: 'default-openai'
@@ -241,6 +243,20 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 />
                 <span className="text-sm font-medium">失去焦点时关闭窗口</span>
               </label>
+
+              <div className="mb-4">
+                <label className="block text-sm font-medium mb-2">全局快捷键（打开翻译界面）</label>
+                <input
+                  type="text"
+                  value={localSettings.globalShortcut || 'CommandOrControl+Shift+T'}
+                  onChange={(e) => setLocalSettings(prev => ({ ...prev, globalShortcut: e.target.value }))}
+                  className="w-full p-2 border rounded"
+                  placeholder="例如: CommandOrControl+Shift+T"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  格式: CommandOrControl+Shift+T (Ctrl/Cmd+Shift+T)
+                </p>
+              </div>
             </div>
 
             <div className="border-b border-gray-200">

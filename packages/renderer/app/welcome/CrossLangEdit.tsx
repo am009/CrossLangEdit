@@ -72,15 +72,31 @@ export const CrossLangEdit: React.FC = () => {
       }
     });
 
+    // 注册全局快捷键监听器
+    const unsubscribeShortcut = window.electronAPI.globalShortcut.onTriggered(() => {
+      // 打开翻译界面，但不设置文本
+      setCurrentText('');
+      setCurrentTranslatedText('');
+      setCurrentPrefix(settings.prefixConfigs[0]?.prefix || '#zh:');
+      setIsTranslationModalOpen(true);
+    });
+
     if (settings.enabled) {
       startMonitoring();
     }
 
+    // 注册全局快捷键
+    if (settings.globalShortcut) {
+      window.electronAPI.globalShortcut.register(settings.globalShortcut);
+    }
+
     return () => {
       unsubscribe();
+      unsubscribeShortcut();
       stopMonitoring();
+      window.electronAPI.globalShortcut.unregister();
     };
-  }, [settings.enabled, isClient]);
+  }, [settings.enabled, settings.globalShortcut, isClient]);
 
   const startMonitoring = async () => {
     if (!isClient || !window.electronAPI?.clipboard) return;
@@ -147,6 +163,16 @@ export const CrossLangEdit: React.FC = () => {
     if (window.electronAPI?.clipboard) {
       const prefixes = newSettings.prefixConfigs.map(p => p.prefix);
       window.electronAPI.clipboard.updatePrefixes(prefixes);
+    }
+
+    // 更新全局快捷键
+    if (window.electronAPI?.globalShortcut) {
+      if (settings.globalShortcut !== newSettings.globalShortcut) {
+        window.electronAPI.globalShortcut.unregister();
+        if (newSettings.globalShortcut) {
+          window.electronAPI.globalShortcut.register(newSettings.globalShortcut);
+        }
+      }
     }
 
     if (newSettings.enabled && !isMonitoring) {

@@ -24,6 +24,7 @@ const defaultSettings: SettingsConfig = {
   enabled: true,
   copyTranslationOnly: false,
   closeOnBlur: false,
+  globalShortcut: '',
   apiConfigs: [defaultApiConfig],
   prefixConfigs: [defaultPrefixConfig],
   defaultApiConfigId: 'default-openai'

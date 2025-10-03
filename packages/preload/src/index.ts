@@ -22,10 +22,22 @@ const window = {
   hide: () => ipcRenderer.invoke('window-hide')
 };
 
+const globalShortcut = {
+  register: (shortcut: string) => ipcRenderer.invoke('register-global-shortcut', shortcut),
+  unregister: () => ipcRenderer.invoke('unregister-global-shortcut'),
+  checkRegistered: (shortcut: string) => ipcRenderer.invoke('check-shortcut-registered', shortcut),
+  onTriggered: (callback: () => void) => {
+    const handler = () => callback();
+    ipcRenderer.on('global-shortcut-triggered', handler);
+    return () => ipcRenderer.off('global-shortcut-triggered', handler);
+  }
+};
+
 // 使用 contextBridge 安全地暴露 API
 contextBridge.exposeInMainWorld('electronAPI', {
   clipboard,
-  window
+  window,
+  globalShortcut
 });
 
 export {sha256sum, versions, send, clipboard};

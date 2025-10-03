@@ -18,6 +18,12 @@ declare global {
       window: {
         hide: () => Promise<boolean>;
       };
+      globalShortcut: {
+        register: (shortcut: string) => Promise<boolean>;
+        unregister: () => Promise<boolean>;
+        checkRegistered: (shortcut: string) => Promise<boolean>;
+        onTriggered: (callback: () => void) => () => void;
+      };
     };
   }
 }
